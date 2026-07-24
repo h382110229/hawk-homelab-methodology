@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "hawk-homelab"
+version = "1.0.0"
+description = "Scaffold a new homelab project using the Hawk methodology"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+keywords = ["homelab", "hawk", "scaffold", "docker", "mac-pro"]
+
+[project.scripts]
+hawk-homelab = "hawk_homelab.cli:main"

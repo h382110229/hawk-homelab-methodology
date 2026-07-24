@@ -1,0 +1,33 @@
+# docker-compose.yml — test-python-project 服务定义
+# 由 create-hawk-homelab 生成
+# 目标环境: Mac Pro 6,1 (2013), Colima (QEMU x86_64)
+
+services:
+  test-python-project:
+    image: nginx:1.25
+    container_name: hawk-test-python-project
+    restart: unless-stopped
+    ports:
+      - "5555:8080"
+    volumes:
+      - test-python-project-data:/data
+    networks:
+      - app-net
+    environment:
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "hawk.project=test-python-project"
+      - "hawk.managed=true"
+
+volumes:
+  test-python-project-data:
+
+networks:
+  app-net:
+    external: true

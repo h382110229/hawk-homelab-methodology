@@ -1,0 +1,97 @@
+# renovate-deploy.yml — Renovate 合并后自动部署
+# 触发: Renovate PR 被合并到 main
+# 流程: 检测镜像更新 → 部署 → 验证
+
+name: Renovate Auto-Deploy
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+env:
+  PROJECT_NAME: "test-python-project"
+  DEPLOY_HOST: "192.168.31.236"
+  DEPLOY_USER: "huoke"
+  DEPLOY_DIR: "/opt/stacks/test-python-project"
+
+jobs:
+  renovate-deploy:
+    # 只在 Renovate PR 合并时触发
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.login == 'renovate[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        run: |
+          # 检查是否只有镜像版本变更
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # 如果包含 postgres 主版本变更，阻止自动部署
+          if echo "$CHANGED_FILES" | grep -q "docker-compose.yml"; then
+            DIFF=$(git diff HEAD~1 HEAD -- docker-compose.yml)
+            if echo "$DIFF" | grep -q "postgres:"; then
+              MAJOR_CHANGE=$(echo "$DIFF" | grep "postgres:" | head -1)
+              # 检测主版本号变化 (e.g., 15 → 16)
+              OLD_VER=$(echo "$MAJOR_CHANGE" | grep -oP '(?<=- )postgres:\K\d+')
+              NEW_VER=$(echo "$MAJOR_CHANGE" | grep -oP '(?<=\+ )postgres:\K\d+')
+              if [ "$OLD_VER" != "$NEW_VER" ]; then
+                echo "::error::Postgres major version change detected ($OLD_VER → $NEW_VER). Manual deployment required."
+                exit 1
+              fi
+            fi
+          fi
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            cd ${{ env.DEPLOY_DIR }}
+            export DOCKER_HOST=unix:///Users/huoke/.colima/docker.sock
+
+            echo "=== Renovate auto-deploy ==="
+            echo "Pulling latest changes from merged PR..."
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== Pulling new images ==="
+            docker compose pull
+
+            echo "=== Deploying ==="
+            bash deploy.sh
+
+            echo "=== Verify health ==="
+            sleep 10
+            curl -sf --retry 5 --retry-delay 5 http://localhost:5555/health
+
+      - name: Comment on PR
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Renovate auto-deploy completed successfully!'
+            })
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Renovate auto-deploy failed for ${{ env.PROJECT_NAME }}"
