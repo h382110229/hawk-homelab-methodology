@@ -1,0 +1,16 @@
+{
+  "name": "create-hawk-homelab",
+  "version": "1.0.0",
+  "description": "Scaffold a new homelab project using the Hawk methodology",
+  "bin": {
+    "create-hawk-homelab": "./bin/create-hawk-homelab.js"
+  },
+  "scripts": {
+    "test": "node bin/create-hawk-homelab.js test-project --port 3333"
+  },
+  "keywords": ["homelab", "hawk", "scaffold", "docker", "mac-pro"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
