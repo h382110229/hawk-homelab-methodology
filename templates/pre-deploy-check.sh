@@ -49,7 +49,7 @@ check_memory() {
     local free_pages
     free_pages=$(vm_stat | awk '/Pages free/ {gsub(/\./,"",$3); print $3}' 2>/dev/null || echo "0")
     local page_size
-    page_size=$(vm_stat | awk '/page size/ {print $NF}' 2>/dev/null || echo "4096")
+    page_size=$(vm_stat | awk '/page size/ {for(i=1;i<=NF;i++) if($i ~ /^[0-9]+$/) print $i}' 2>/dev/null || echo "4096")
     local free_mb=$(( (free_pages * page_size) / 1024 / 1024 ))
 
     if [ "$free_mb" -gt 2048 ]; then
