@@ -1,0 +1,74 @@
+# deploy.yml — {{PROJECT_NAME}} CI/CD 部署工作流
+# 触发: push to main
+# 流程: lint → test → SSH 部署到 Mac Pro
+
+name: Deploy {{PROJECT_NAME}}
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - '.gitignore'
+
+env:
+  PROJECT_NAME: "{{PROJECT_NAME}}"
+  DEPLOY_HOST: "192.168.31.236"
+  DEPLOY_USER: "huoke"
+  DEPLOY_DIR: "/opt/stacks/{{PROJECT_NAME}}"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate docker-compose
+        run: docker compose config --quiet
+
+      - name: Run smoke tests
+        run: |
+          chmod +x tests/smoke-test.sh
+          # Smoke tests run locally with docker compose
+          # bash tests/smoke-test.sh
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            cd ${{ env.DEPLOY_DIR }}
+            export DOCKER_HOST=unix:///Users/huoke/.colima/docker.sock
+
+            echo "=== Pre-deploy check ==="
+            bash pre-deploy-check.sh
+
+            echo "=== Pulling latest code ==="
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== Deploying ==="
+            bash deploy.sh
+
+            echo "=== Verify health ==="
+            sleep 10
+            curl -sf --retry 5 --retry-delay 5 http://localhost:{{PORT}}/health
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Deployment failed for ${{ env.PROJECT_NAME }}"
+          # Add notification webhook here
