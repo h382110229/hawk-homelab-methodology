@@ -51,6 +51,10 @@ EOF
 # ============================================================
 rollback_service() {
     log_info "=== Level 1: Service Rollback ==="
+    # PT 保护: 确认不会影响 Transmission
+    if docker ps --format '{{.Names}}' 2>/dev/null | grep -q "hawk-transmission"; then
+        log_info "Transmission running — will NOT be affected by this rollback"
+    fi
     log_info "Rolling back $PROJECT_NAME to previous version..."
 
     # 检查是否有保存的回滚镜像
