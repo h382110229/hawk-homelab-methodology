@@ -120,6 +120,7 @@ replace_placeholders() {
     s/\{\{VERSION\}\}/$VERSION/g;
     s/\{\{PROJECT_DESCRIPTION\}\}/$PROJECT_DESCRIPTION/g;
     s/\{\{SERVICE_DESCRIPTION\}\}/$PROJECT_DESCRIPTION/g;
+    s/\{\{DB_USER\}\}/postgres/g;
     s/\{\{DATE\}\}/$(date +%Y-%m-%d)/g;
   " "$file"
 }

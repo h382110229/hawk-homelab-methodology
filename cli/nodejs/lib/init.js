@@ -141,6 +141,7 @@ function replacePlaceholders(filePath, vars) {
   content = content.replace(/\{\{VERSION\}\}/g, vars.version);
   content = content.replace(/\{\{PROJECT_DESCRIPTION\}\}/g, vars.description);
   content = content.replace(/\{\{SERVICE_DESCRIPTION\}\}/g, vars.description);
+  content = content.replace(/\{\{DB_USER\}\}/g, 'postgres');
   content = content.replace(/\{\{DATE\}\}/g, today);
 
   fs.writeFileSync(filePath, content, 'utf8');

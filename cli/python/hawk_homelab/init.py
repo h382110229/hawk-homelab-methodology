@@ -69,6 +69,7 @@ def replace_placeholders(content: str, vars: dict) -> str:
     content = content.replace("{{VERSION}}", vars["version"])
     content = content.replace("{{PROJECT_DESCRIPTION}}", vars["description"])
     content = content.replace("{{SERVICE_DESCRIPTION}}", vars["description"])
+    content = content.replace("{{DB_USER}}", "postgres")
     content = content.replace("{{DATE}}", today)
 
     return content
