@@ -334,18 +334,93 @@ docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}"
 
 ## Skill 矩阵（Hermes 已配备）
 
-| Skill | 用途 | 阶段 |
-|-------|------|------|
-| `ai-development-workflows` | Spec-Driven + TDD + 多 Agent 模式 | 1-4 |
-| `claude-code` | Claude Code CLI 编码委托 | 3 |
-| `test-driven-development` | TDD 红绿重构 | 3 |
-| `homelab-cicd` | ★ deploy.sh + GitHub Actions + Colima 感知 | 5 |
-| `deploy-rollback` | ★ 回滚流程 + 镜像版本锁定 | 5 |
-| `uptime-monitoring` | ★ Uptime Kuma + 告警到飞书/QQ | 6 |
-| `renovate-homelab` | ★ Docker 镜像自动更新 | 7 |
-| `hawk-home-server` | 服务架构 + Colima + Clash + CF Tunnel | 全部 |
-| `github-pr-workflow` | PR 生命周期 | 3-5 |
-| `github-code-review` | PR 审查 | 4 |
+### Phase 1 — 需求规划
+
+| Skill | 用途 |
+|-------|------|
+| `ai-development-workflows` | Spec-Driven + TDD + 多 Agent + 上下文管理 |
+| `spike` | 一次性实验验证可行性 |
+| `plan` | 写可执行的实施计划 |
+
+### Phase 2 — 架构设计
+
+| Skill | 用途 |
+|-------|------|
+| `plan` | 详细实施计划（含文件路径、代码、命令） |
+| `brand-design-system` | 品牌 Design Token 驱动 UI |
+
+### Phase 3 — 代码开发
+
+| Skill | 用途 |
+|-------|------|
+| `claude-code` | Claude Code CLI 编码委托 |
+| `codex` | OpenAI Codex 编码委托 |
+| `opencode` | OpenCode 编码委托 |
+| `test-driven-development` | TDD 红绿重构 |
+| `ai-development-workflows` | Writer/Reviewer + Fan-out + 上下文管理 |
+| `simplify-code` | 3 Agent 并行代码清理 |
+
+### Phase 4 — 测试验证
+
+| Skill | 用途 |
+|-------|------|
+| `systematic-debugging` | 4 阶段根因调试 |
+| `test-driven-development` | 测试驱动验证 |
+| `requesting-code-review` | 提交前安全/质量门 |
+| `github-code-review` | PR 审查 |
+
+### Phase 5 — 部署上线
+
+| Skill | 用途 |
+|-------|------|
+| `homelab-cicd` | ★ deploy.sh + GitHub Actions + Colima 感知部署 |
+| `deploy-rollback` | ★ 4 级回滚 + 镜像版本锁定 |
+| `github-pr-workflow` | PR → CI → 合并 → 部署 |
+| `hawk-home-server` | 服务架构 + Colima + Clash + CF Tunnel |
+
+### Phase 6 — 监控运维
+
+| Skill | 用途 |
+|-------|------|
+| `uptime-monitoring` | ★ Uptime Kuma + 飞书/QQ 告警 |
+| `hawk-home-server` | 数据持久化 + 备份 |
+| `clash-verge` | 代理配置管理 |
+
+### Phase 7 — 持续演进
+
+| Skill | 用途 |
+|-------|------|
+| `renovate-homelab` | ★ Docker 镜像自动更新 |
+
+### 全生命周期通用
+
+| Skill | 用途 |
+|-------|------|
+| `hermes-agent` | Hermes 自身配置和扩展 |
+| `safe-destructive-operations` | 危险操作安全规则 |
+
+### Skill 关联图
+
+```
+ai-development-workflows ←── plan ←── spike
+         ↕                    ↕
+    claude-code          test-driven-development
+         ↕                    ↕
+    codex/opencode       systematic-debugging
+                              ↕
+                      simplify-code / requesting-code-review
+                              ↕
+                       github-pr-workflow ←── github-code-review
+                              ↕
+                        homelab-cicd ←── hawk-home-server
+                              ↕
+                    ┌─────────┼─────────┐
+              deploy-rollback  │   renovate-homelab
+                               │
+                      uptime-monitoring
+```
+
+★ = 本次新建的 Skill（4 个）
 
 ---
 
