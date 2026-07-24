@@ -34,16 +34,33 @@ hawk-homelab-methodology/
 - PT 做种不能中断（Transmission 必须 24/7）
 - macOS 12.7.6 Tier 3（优先用 Docker 而非 host 安装）
 
-## 配套 Hermes Skills
+## 配套 Hermes Skills（20 个）
+
+### 本次新建（4 个）
 
 | Skill | 用途 |
 |-------|------|
 | `homelab-cicd` | deploy.sh + GitHub Actions + Colima 感知部署 |
-| `deploy-rollback` | 回滚流程 + 镜像版本锁定 |
-| `uptime-monitoring` | Uptime Kuma + 飞书/QQ 告警 |
-| `renovate-homelab` | Docker 镜像自动更新 |
-| `ai-development-workflows` | Spec-Driven + TDD + 多 Agent 模式 |
-| `hawk-home-server` | 服务架构 + Colima + Clash + CF Tunnel |
+| `deploy-rollback` | 4 级回滚 + 镜像版本锁定 + 紧急恢复 |
+| `uptime-monitoring` | Uptime Kuma + 飞书/QQ 告警 + Healthchecks.io |
+| `renovate-homelab` | Docker 镜像自动更新 + 自动合并策略 |
+
+### 已有（16 个）
+
+| Skill | 阶段 |
+|-------|------|
+| `ai-development-workflows` | 需求 + 开发 |
+| `plan` | 规划 |
+| `spike` | 验证 |
+| `claude-code` / `codex` / `opencode` | 开发 |
+| `test-driven-development` | 开发 + 测试 |
+| `systematic-debugging` | 测试 |
+| `simplify-code` | 开发 |
+| `requesting-code-review` / `github-code-review` | 测试 |
+| `github-pr-workflow` | 部署 |
+| `hawk-home-server` / `clash-verge` | 运维 |
+| `hermes-agent` | 通用 |
+| `safe-destructive-operations` | 通用 |
 
 ## License
 
